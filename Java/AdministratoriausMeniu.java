@@ -42,6 +42,15 @@ public class AdministratoriausMeniu {
                 case 7:
                     removeTeacher();
                     break;
+                case 8:
+                    displayParents();
+                    break;
+                case 9:
+                    chooseClass();
+                    break;
+                case 10:
+                    displayTeachers();
+                    break;
                 default:
                     throw new AssertionError();
             }
@@ -59,8 +68,11 @@ public class AdministratoriausMeniu {
         System.out.println("5. Pakeisti mokinio adresa");
         System.out.println("6. Pasalinti mokini");
         System.out.println("7. Pasalinti mokytoja");
+        System.out.println("8. Perziureti visus globejus");
+        System.out.println("9. Perziureti visus mokinius");
+        System.out.println("10. Perziureti visus mokytojus");
         System.out.println();
-        return MainMeniu.readInt(0, 7);
+        return MainMeniu.readInt(0, 10);
     }
 
     private void registerNewParent(){
@@ -392,7 +404,7 @@ public class AdministratoriausMeniu {
             System.out.println();
 
             if (!rs.isBeforeFirst() ) {
-                System.out.println("Neegzituoja nei viena klase.");
+                System.out.println("Neegzistuoja nei viena klase.");
                 System.out.println();
                 return;
             }
@@ -534,12 +546,17 @@ public class AdministratoriausMeniu {
             stmt = connection.createStatement();
             rs = stmt.executeQuery("SELECT mokytojo_nr, vardas, pavarde, dalykas FROM Mokytojas");
             System.out.println();
-            System.out.println("-------------MOKYTOJAI------------");
-            while (rs.next()) {
-                System.out.print(rs.getInt("mokytojo_nr") + "  ");
-                System.out.print(rs.getString("vardas") + "  ");
-                System.out.print(rs.getString("pavarde") + "  ");
-                System.out.println(rs.getString("dalykas"));
+            if (!rs.isBeforeFirst() ) {
+                System.out.println("Nera mokytoju.");
+            }
+            else {
+                System.out.println("-------------MOKYTOJAI------------");
+                while (rs.next()) {
+                    System.out.print(rs.getInt("mokytojo_nr") + "  ");
+                    System.out.print(rs.getString("vardas") + "  ");
+                    System.out.print(rs.getString("pavarde") + "  ");
+                    System.out.println(rs.getString("dalykas"));
+                }
             }
             System.out.println();
         } catch (SQLException e) {
@@ -636,4 +653,38 @@ public class AdministratoriausMeniu {
         return dalykas;
     }
 
+    private void displayParents() {
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = connection.createStatement();
+            rs = stmt.executeQuery("SELECT * FROM Globejas");
+            System.out.println();
+            if (!rs.isBeforeFirst() ) {
+                System.out.println("Nera globeju.");
+            }
+            else {
+                System.out.println("-------------GLOBEJAI------------");
+                while (rs.next()) {
+                    System.out.print(rs.getInt("AK") + "  ");
+                    System.out.print(rs.getString("vardas") + "  ");
+                    System.out.print(rs.getString("pavarde") + "  ");
+                }
+            }
+            System.out.println();
+        } catch (SQLException e) {
+            System.out.println("SQL Error!");
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null)
+                    rs.close();
+                if (stmt != null)
+                    stmt.close();
+            } catch (SQLException exp) {
+                System.out.println("Unexpected SQL Error!");
+                exp.printStackTrace();
+            }
+        }
+    }
 }
